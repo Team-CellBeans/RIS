@@ -19,7 +19,7 @@ public class Patient {
 	private String contactNumber;
 	private String address;
 	private String medicalHistory;
-	  private Boolean isEmergency = false;
+	private Boolean isEmergency = false;
 	
 	public Patient(){}
 

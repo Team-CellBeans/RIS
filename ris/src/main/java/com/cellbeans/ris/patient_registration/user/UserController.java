@@ -1,6 +1,7 @@
 package com.cellbeans.ris.patient_registration.user;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ public class UserController {
 	
 	  @Autowired
 	    private UserService userService;
+	  @Autowired
+	  JwtUtil jwtUtil;
 
 	    @GetMapping("/getAllUser")
 	    public List<UserDTO> getAllUsers() {
@@ -48,11 +51,13 @@ public class UserController {
 	    }
 	    
 	    @PostMapping("/login")
-	    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+	    public ResponseEntity<Map<String, String>> login(@RequestBody LoginRequest loginRequest) {
 	        Optional<UserDTO> user = userService.login(loginRequest.getEmail(), loginRequest.getPassword());
-	        return user.<ResponseEntity<?>>map(ResponseEntity::ok)
-	                   .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials"));
+	        return user.map(u -> ResponseEntity.ok(Map.of("token", jwtUtil.generateToken(u.getEmail()))))
+	                   .orElseGet(() -> ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+	                                                 .body(Map.of("error", "Invalid credentials")));
 	    }
+
 
 
 }
